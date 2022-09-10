@@ -106,11 +106,44 @@ def Heatdistrobution(products, energy):
         loadedpart[aloaded] += 1
 
     #Calc 3.
+    #Build the large shomate equation
+    shomate = "0"
+    for i in products:
+        shomate += " + "+str(i.mols)+"*(0"
+        shomate += "+"+str(i.shomate[loadedpart[i]][0])
+        shomate += "+"+str(i.shomate[loadedpart[i]][1])+"*(x/1000)"
+        shomate += "+"+str(i.shomate[loadedpart[i]][2])+"*(x/1000)**2"
+        shomate += "+"+str(i.shomate[loadedpart[i]][3])+"*(x/1000)**3"
+        shomate += "+"+str(i.shomate[loadedpart[i]][4])+"*(x/1000)**(-2)"
+        shomate += ")"
+    print(shomate)
+    #solve for antiderivative
+    x = symbols("x")
+    antiderivative = integrate(shomate, x)
+    #Thanks to FTC we combine antiderivative and energy (and make it negative)
+    energy += antiderivative.subs(x, lowerbound)
+    #to prove that my math works uncomment the next lines
+    #print(antiderivative.subs(x, min(upperbounds))-antiderivative.subs(x, lowerbound))
+    #print(integrate(shomate, (x, lowerbound, min(upperbounds))))
+    energy = energy*(-1)
+    solutions = list(solveset(antiderivative+energy, x, domain=Reals))
+    #find valid solution
+    for i in solutions:
+        if i >= lowerbound:
+            solutions.remove(i)
+        elif i <= min(upperbounds):
+            solutions.remove(i)
+    #Update temperature
+    if len(solutions) == 1:
+        for i in products:
+            i.temperature=solutions[0]
+    else:
+        raise TypeError(str(len(solutions)-1) + " excess solutions found : " + str(solutions))
 
 
 
 
-
+#I will incorperate CSV Reader later
 #Given
 #C2H5OH + 3O2 -> 3H20 + 2CO2
 Water = Product("H20", 1 , 300,[[-203.6060,1523.290,-3196.413,2474.455,3.855326,298,500],[30.09200, 6.832514, 6.793435, -2.534480, 0.082139, 500, 1700]])
@@ -125,4 +158,5 @@ print(Shomate(substances[0], substances[0].shomate[0], 298, 500))
 print(Shomate(substances[0], substances[0].shomate[1], substances[0].shomate[1][5], substances[0].shomate[1][6]))
 print("Heat Distro ----------------------------------------------------")
 Heatdistrobution(substances, 17000)
+print(Water.temperature)
 #Solution
