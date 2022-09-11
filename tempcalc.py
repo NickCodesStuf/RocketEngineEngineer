@@ -27,14 +27,15 @@ def Shomate(species, equation, a, b):
     # Reset shomate value
     shomate = "0"
     # Populate the shomate equation
+    shomate += "+"+ str(species.mols) + "*("
     shomate += "+(" + str(equation[0]) + ") "
     shomate += "+(" + str(equation[1]) + ")*(x/1000) "
     shomate += "+(" + str(equation[2]) + ")*(x/1000)**2 "
     shomate += "+(" + str(equation[3]) + ")*(x/1000)**3 "
-    shomate += "+(" + str(equation[4]) + ")*(x/1000)**(-2) "
+    shomate += "+(" + str(equation[4]) + ")*(x/1000)**(-2) )"
     # Integrate and export value
     x = symbols("x")
-    energy = integrate(shomate, (x, a, b)) * species.mols
+    energy = integrate(shomate, (x, a, b))
     #My physics teacher is dissapointed, No sig figs???
     #For now I repent and promise to add a sig fig function later
     print("changing temperatures between " + str(equation[5]) + " : " + str(equation[6]) + " energy is " + str(energy))
@@ -104,7 +105,8 @@ def Heatdistrobution(products, energy):
         lowerbound = min(upperbounds)
         #here we cycle to the next partion for the reactant marked as "aloaded"
         loadedpart[aloaded] += 1
-
+    energy -= 81400
+    print(energy)
     #Calc 3.
     #Build the large shomate equation
     shomate = "0"
@@ -128,6 +130,7 @@ def Heatdistrobution(products, energy):
     energy = energy*(-1)
     solutions = list(solveset(antiderivative+energy, x, domain=Reals))
     #find valid solution
+    print(solutions)
     for i in solutions:
         if i >= lowerbound:
             solutions.remove(i)
@@ -143,20 +146,3 @@ def Heatdistrobution(products, energy):
 
 
 
-#I will incorperate CSV Reader later
-#Given
-#C2H5OH + 3O2 -> 3H20 + 2CO2
-Water = Product("H20", 1 , 300,[[-203.6060,1523.290,-3196.413,2474.455,3.855326,298,500],[30.09200, 6.832514, 6.793435, -2.534480, 0.082139, 500, 1700]])
-substances = [Water]
-
-
-#Unknown
-#Equations
-#C6H12O6+
-#Substitution
-print(Shomate(substances[0], substances[0].shomate[0], 298, 500))
-print(Shomate(substances[0], substances[0].shomate[1], substances[0].shomate[1][5], substances[0].shomate[1][6]))
-print("Heat Distro ----------------------------------------------------")
-Heatdistrobution(substances, 17000)
-print(Water.temperature)
-#Solution
