@@ -17,8 +17,6 @@ def tempcalc():
     # Solution
 
 if __name__ == '__main__':
-    #objectbuilder(csvtoarray('testdata.csv'))
-    a = [0.566, 0.00056, 0.0544]
-    sigfig(a)
+    objectbuilder(csvtoarray('testdata.csv'))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
