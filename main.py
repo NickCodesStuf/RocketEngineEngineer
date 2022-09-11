@@ -1,5 +1,6 @@
 from tempcalc import *
 from csvreader import *
+from dataprocessing import *
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -16,5 +17,8 @@ def tempcalc():
     # Solution
 
 if __name__ == '__main__':
-    objectbuilder(csvtoarray('testdata.csv'))
+    #objectbuilder(csvtoarray('testdata.csv'))
+    a = [0.566, 0.00056, 0.0544]
+    sigfig(a)
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
