@@ -36,9 +36,13 @@ def Shomate(species, equation, a, b):
     # Integrate and export value
     x = symbols("x")
     energy = integrate(shomate, (x, a, b))
+    eq = sympify(shomate)
+    # print(shomate)
+    print('Specific heat range is between '+str(eq.subs(x, a))+':'+str(eq.subs(x, b)))
     #My physics teacher is dissapointed, No sig figs???
+    print('Heating ' + species.name + ' from ' + str(equation[5]) + 'k to ' + str(equation[6]) + 'k takes '+ str(energy) + 'j')
     #For now I repent and promise to add a sig fig function later
-    print("changing temperatures between " + str(equation[5]) + " : " + str(equation[6]) + " energy is " + str(energy))
+
     return(energy)
 
 def Heatdistrobution(products, energy):
@@ -47,7 +51,7 @@ def Heatdistrobution(products, energy):
     loadedpart = {}
 
     #Calc.1
-    print("calc1")
+    print("calc1-----------------------------------------------")
     # integrate to unify temperatures
     testtemp = []
     # determine largest starting temperature
@@ -57,20 +61,23 @@ def Heatdistrobution(products, energy):
     # loop through every shomate under mintemp
     for i in products:
         s = 0
-        tempcount = 0
+        tempcount = i.temperature
         # Consolodate shomate
         while tempcount < max(testtemp):
             #Integrate the partition and subtract it from energy
-            energy -= Shomate(i, i.shomate[s], i.shomate[s][5], i.shomate[s][6])
+            denergy = Shomate(i, i.shomate[s], i.shomate[s][5], i.shomate[s][6])
             #sets tempcount new mintemp and cycles partitions
+            if tempcount<max(testtemp):
+                break
+            energy -=denergy
             tempcount = i.shomate[s][6]
             s += 1
             #Breaks loop if tempcount
         #adds back excess and update the loaded partition for the object
         #-1 self esteem
-        energy += Shomate(i, i.shomate[s-1], max(testtemp), i.shomate[s-1][6])
-        loadedpart[i] = s-1
-
+        loadedpart[i] = s
+        print("innitial temperature = " + str(max(testtemp)))
+    print('energy = '+ str(energy))
 
     #Calc.2
     print("calc2 -------------------------------------------------")
@@ -102,11 +109,10 @@ def Heatdistrobution(products, energy):
             break
         #otherwise remove energy, reset, and repeat with new subpartition
         energy-=denergy
-        lowerbound = min(upperbounds)
+        lowerbound = float(min(upperbounds))
         #here we cycle to the next partion for the reactant marked as "aloaded"
         loadedpart[aloaded] += 1
-    energy -= 81400
-    print(energy)
+    print("calc. 3 ---------------------------------------------------")
     #Calc 3.
     #Build the large shomate equation
     shomate = "0"
@@ -130,11 +136,10 @@ def Heatdistrobution(products, energy):
     energy = energy*(-1)
     solutions = list(solveset(antiderivative+energy, x, domain=Reals))
     #find valid solution
-    print(solutions)
     for i in solutions:
-        if i >= lowerbound:
+        if float(i) >= float(lowerbound):
             solutions.remove(i)
-        elif i <= min(upperbounds):
+        elif float(i) <= float(min(upperbounds)):
             solutions.remove(i)
     #Update temperature
     if len(solutions) == 1:
